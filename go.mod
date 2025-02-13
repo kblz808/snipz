@@ -1,4 +1,4 @@
-module github.com/kblz808/snipz
+module snipz
 
 go 1.23.4
 
@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/golang-migrate/migrate/v4 v4.18.2
 	github.com/jackc/pgx/v5 v5.7.2
+	github.com/joho/godotenv v1.5.1
 )
 
 require (

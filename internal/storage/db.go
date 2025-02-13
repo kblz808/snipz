@@ -4,15 +4,14 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"snipz/internal/utils"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/kblz808/snipz/internal/utils"
 
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 )
 
@@ -67,4 +66,8 @@ func (db *DB) Migrate() error {
 func (db *DB) ErrorCode(err error) string {
 	pgErr := err.(*pgconn.PgError)
 	return pgErr.Code
+}
+
+func (db *DB) Close() {
+	db.Pool.Close()
 }
