@@ -1,0 +1,31 @@
+version: "3"
+
+vars:
+  DSN: "{{.DB_CONNECTION}}//{{.DB_USER}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:{{.DB_PORT}}"
+
+dotenv:
+  - ".env"
+
+tasks:
+  install:
+    cmd: go mod tidy
+  db:up:
+    cmd: sudo docker-compose up --build
+  db:down:
+    cmd: sudo docker-compose down -v
+  db:cli:
+    cmd: sudo docker exec -it go-hex_postgres sh -c "psql -U {{.DB_USER}} -d {{.DB_NAME}}"
+    requires:
+      vars:
+        - DB_USER
+        - DB_NAME
+  migrate:up:
+    cmd: migrate -path ./internal/adapter/storage/postgres/migrations -database {{.DSN}} -verbose up {{.CLI_ARGS}}
+    requires:
+      vars:
+        - DSN
+  migrate:down:
+    cmd: migrate -path ./internal/adapter/storage/postgres/migrations -database {{.DSN}} --verbose down {{.CLI_ARGS}}
+    requires:
+      vars:
+        - DSN
