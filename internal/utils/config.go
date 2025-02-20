@@ -1,6 +1,10 @@
 package utils
 
-import "os"
+import (
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 type DB struct {
 	Connection string
@@ -16,6 +20,11 @@ type Container struct {
 }
 
 func New() (*Container, error) {
+	err := godotenv.Load()
+	if err != nil {
+		return nil, err
+	}
+
 	db := &DB{
 		Connection: os.Getenv("DB_CONNECTION"),
 		Host:       os.Getenv("DB_HOST"),
