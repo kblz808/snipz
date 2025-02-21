@@ -13,8 +13,8 @@ import (
 type User struct {
 	ID int64
 
-	Username       string
-	HashedPassword string
+	Username string
+	Password string
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -30,8 +30,8 @@ func NewUserRepository(db *storage.DB) *UserRepository {
 
 func (ur *UserRepository) CreateUser(ctx context.Context, user *User) (*User, error) {
 	query := ur.db.QueryBuilder.Insert("users").
-		Columns("username", "hashed_password").
-		Values(user.Username, user.HashedPassword).
+		Columns("username", "password").
+		Values(user.Username, user.Password).
 		Suffix("RETURNING *")
 
 	sql, args, err := query.ToSql()
