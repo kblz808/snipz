@@ -21,19 +21,19 @@ type registerRequest struct {
 	Password string `json:"password"`
 }
 
-func (handler *UserHandler) Reister(ctx *gin.Context) {
+func (handler *UserHandler) Register(ctx *gin.Context) {
 	var req registerRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}
 
-	user := repository.User{
+	user := &repository.User{
 		Username: req.Username,
 		Password: req.Password,
 	}
 
-	_, err := handler.service.Register(ctx, &user)
+	_, err := handler.service.Register(ctx, user)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

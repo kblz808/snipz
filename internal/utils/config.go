@@ -19,7 +19,7 @@ type Config struct {
 	DB *DB
 }
 
-func New() (*Config, error) {
+func NewConfig() (*Config, error) {
 	err := godotenv.Load()
 	if err != nil {
 		return nil, err

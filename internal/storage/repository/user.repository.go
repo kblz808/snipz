@@ -79,3 +79,29 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*User, er
 
 	return &user, nil
 }
+
+func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*User, error) {
+	var user User
+
+	query := ur.db.QueryBuilder.Select("*").
+		From("users").
+		Where(sq.Eq{"email": email}).
+		Limit(1)
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	err = ur.db.QueryRow(ctx, sql, args...).Scan(
+		&user.ID,
+		&user.Username,
+		&user.CreatedAt,
+	)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, errors.New("data not found")
+		}
+	}
+	return &user, nil
+}
