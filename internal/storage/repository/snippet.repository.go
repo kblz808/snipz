@@ -31,8 +31,8 @@ type Snippet struct {
 
 	Visibility Visibility
 
-	IsEncrypted  bool
-	PasswordHash string
+	IsEncrypted bool
+	Password    string
 
 	ViewCount int64
 	Tags      []string
@@ -53,8 +53,8 @@ func NewSnippetRepository(db *storage.DB) *SnippetRepository {
 
 func (repo *SnippetRepository) CreateSnippet(ctx context.Context, snippet *Snippet) (*Snippet, error) {
 	query := repo.db.QueryBuilder.Insert("snippets").
-		Columns("title", "content", "language", "user_id", "expires_at", "visibility", "is_encrypted", "password_hash").
-		Values(snippet.Title, snippet.Content, snippet.Language, snippet.UserID, snippet.ExpiresAt, snippet.Visibility, snippet.IsEncrypted, snippet.PasswordHash).
+		Columns("title", "content", "language", "user_id", "expires_at", "visibility", "is_encrypted", "password").
+		Values(snippet.Title, snippet.Content, snippet.Language, snippet.UserID, snippet.ExpiresAt, snippet.Visibility, snippet.IsEncrypted, snippet.Password).
 		Suffix("RETURNING *")
 
 	sql, args, err := query.ToSql()
@@ -71,7 +71,7 @@ func (repo *SnippetRepository) CreateSnippet(ctx context.Context, snippet *Snipp
 		&snippet.ExpiresAt,
 		&snippet.Visibility,
 		&snippet.IsEncrypted,
-		&snippet.PasswordHash,
+		&snippet.Password,
 		&snippet.ViewCount,
 		&snippet.Tags,
 		&snippet.StarsCount,
@@ -88,7 +88,7 @@ func (repo *SnippetRepository) CreateSnippet(ctx context.Context, snippet *Snipp
 	return snippet, nil
 }
 
-func (repo *SnippetRepository) GetSnippetByID(ctx context.Context, id uint64) (*Snippet, error) {
+func (repo *SnippetRepository) GetSnippetByID(ctx context.Context, id int64) (*Snippet, error) {
 	var snippet Snippet
 
 	query := repo.db.QueryBuilder.Select("*").
@@ -110,7 +110,7 @@ func (repo *SnippetRepository) GetSnippetByID(ctx context.Context, id uint64) (*
 		&snippet.ExpiresAt,
 		&snippet.Visibility,
 		&snippet.IsEncrypted,
-		&snippet.PasswordHash,
+		&snippet.Password,
 		&snippet.ViewCount,
 		&snippet.Tags,
 		&snippet.StarsCount,
@@ -127,7 +127,7 @@ func (repo *SnippetRepository) GetSnippetByID(ctx context.Context, id uint64) (*
 	return &snippet, nil
 }
 
-func (repo *SnippetRepository) ListSnippets(ctx context.Context, title, language string, skip, limit uint64) ([]Snippet, error) {
+func (repo *SnippetRepository) ListSnippets(ctx context.Context, title, language string, tags []string, skip, limit uint64) ([]Snippet, error) {
 	var snippet Snippet
 	var snippets []Snippet
 
@@ -143,6 +143,10 @@ func (repo *SnippetRepository) ListSnippets(ctx context.Context, title, language
 
 	if title != "" {
 		query = query.Where(sq.ILike{"title": "%" + title + "%"})
+	}
+
+	if tags != nil {
+		query = query.Where("tags @> ?::text[]", tags)
 	}
 
 	sql, args, err := query.ToSql()
@@ -165,7 +169,7 @@ func (repo *SnippetRepository) ListSnippets(ctx context.Context, title, language
 			&snippet.ExpiresAt,
 			&snippet.Visibility,
 			&snippet.IsEncrypted,
-			&snippet.PasswordHash,
+			&snippet.Password,
 			&snippet.ViewCount,
 			&snippet.Tags,
 			&snippet.StarsCount,

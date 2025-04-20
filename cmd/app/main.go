@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	config, err := utils.New()
+	config, err := utils.NewConfig()
 	if err != nil {
 		log.Fatal("error loading env variables", err)
 	}
@@ -28,4 +28,7 @@ func main() {
 	}
 
 	log.Println("successfully migrated the database")
+
+	// _, err = http.NewRouter(db)
+
 }

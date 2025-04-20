@@ -15,11 +15,11 @@ type DB struct {
 	Name       string
 }
 
-type Container struct {
+type Config struct {
 	DB *DB
 }
 
-func New() (*Container, error) {
+func NewConfig() (*Config, error) {
 	err := godotenv.Load()
 	if err != nil {
 		return nil, err
@@ -34,6 +34,6 @@ func New() (*Container, error) {
 		Name:       os.Getenv("DB_NAME"),
 	}
 
-	return &Container{db}, nil
+	return &Config{db}, nil
 
 }
